@@ -35,7 +35,6 @@ public class AuthorRest {
         }
         // Si si existe return instancia del autor
         return  Response.ok(obj.get()).build();
-
     }
 
 
