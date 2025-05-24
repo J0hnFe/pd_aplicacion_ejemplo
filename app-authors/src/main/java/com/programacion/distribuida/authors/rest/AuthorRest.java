@@ -28,13 +28,15 @@ public class AuthorRest {
 
     @GET
     @Path("/{id}")
-    public Response findById(@PathParam("id") Integer id){
+    public Response findById(@PathParam("id") Integer id) {
         var obj = authorRepo.findByIdOptional(id);
-        if(obj.isEmpty()) {
+        if (obj.isEmpty()) {
+
+            // Si no se encuentra el autor, se devuelve un error 404
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         // Si si existe return instancia del autor
-        return  Response.ok(obj.get()).build();
+        return Response.ok(obj.get()).build();
     }
 
 
@@ -43,19 +45,34 @@ public class AuthorRest {
         return authorRepo.listAll();
     }
 
+    @PUT
+    @Path("/{id}")
+    public Response update(@PathParam("id") Integer id, Author author) {
+        var obj = authorRepo.findByIdOptional(id);
+        if (obj.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        authorRepo.update(id, author);
+        return Response.ok(obj.get()).build();
+    }
+
     @GET
     @Path("/find/{isbn}")
-    public List<Author> findByBook(@PathParam("isbn") String isbn){
+    public List<Author> findByBook(@PathParam("isbn") String isbn) {
+
         Config config = ConfigProvider.getConfig();
+
+
         config.getConfigSources().forEach(
                 obj -> System.out.printf(
                         "%d -> %s\n", obj.getOrdinal(), obj.getName()
                 )
         );
 
+        // Busco autores de un libro por su ISBN
         var ret = authorRepo.findByBook(isbn);
 
-        return ret.stream().map(obj ->{
+        return ret.stream().map(obj -> {
             String newName = String.format("%s (%d)", obj.getName(), httpPort);
             obj.setName(newName);
             return obj;

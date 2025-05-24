@@ -1,5 +1,6 @@
 package com.programacion.distribuida.books.rest;
 
+import com.programacion.distribuida.books.clients.AuthorRestClient;
 import com.programacion.distribuida.books.db.Book;
 import com.programacion.distribuida.books.dtos.AuthorDto;
 import com.programacion.distribuida.books.dtos.BookDto;
@@ -11,9 +12,12 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.modelmapper.ModelMapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Path("/books")
@@ -26,95 +30,71 @@ public class BookRest {
     @Inject
     BooksRepository booksRepository;
 
+    @Inject
+    ModelMapper mapper;
+
+    @Inject
+    @ConfigProperty(name = "authors.url")
+    String authorsUrl;
+
+    @Inject
+    @RestClient
+    private AuthorRestClient authorRestClient;
+
     @GET
     @Path("/{isbn}")
     public Response findById(@PathParam("isbn") String isbn) {
-
-
+        // Crear un nuevo DTO para el libro
         BookDto bookDto = new BookDto();
 
-        // 1. Buscar el libro
+        // Buscar el libro por su ISBN en el repositorio
         var obj = booksRepository.findByIdOptional(isbn);
         if (obj.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        var book = obj.get();
 
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setPrice(book.getPrice());
+        // Mapear la entidad Book encontrada al DTO
+        mapper.map(obj.get(), bookDto);
 
-        // 2. Buscar el inventario
+        // Consultar los autores asociados al libro usando el cliente REST
+        var authors = authorRestClient.findByBook(isbn)
+                .stream()
+                .map(AuthorDto::getName) // Obtener solo los nombres de los autores
+                .toList();
 
-        var inventory = book.getInventory();
-        if (inventory != null) {
-            bookDto.setInventorySold(inventory.getSold());
-            bookDto.setInventorySupplied(inventory.getSupplied());
-        }
-
-        // 3  Buscar los autores
-        var client = ClientBuilder.newClient();
-        AuthorDto[] authors = client.target("http://localhost:8080")
-                .path("authors/find/{isbn}")
-                .resolveTemplate("isbn", isbn)
-                .request(MediaType.APPLICATION_JSON)
-                .get(AuthorDto[].class);
-        bookDto.setAuthors(
-                Stream.of(authors)
-                        .map(AuthorDto::getName)
-                        .toList()
-        );
-
-
+        // Asignar la lista de autores al DTO del libro
+        bookDto.setAuthors(authors);
+        // Retornar la respuesta con el DTO del libro y estado 200 OK
         return Response.ok(bookDto).build();
-
-
     }
 
 
 @GET
-@Path("/getAll")
-public Response getAll() {
-    var client = ClientBuilder.newClient();
+@Path("/findAll")
+public List<BookDto> findAll() {
+    // Crear un cliente REST para consultar los autores usando la URL configurada
+    AuthorRestClient client = RestClientBuilder.newBuilder()
+            .baseUri(authorsUrl)
+            .build(AuthorRestClient.class);
 
-    List<BookDto> booksWithAuthors = booksRepository.listAll().stream().map(book -> {
-        BookDto bookDto = new BookDto();
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setPrice(book.getPrice());
-
-        if (book.getInventory() != null) {
-            bookDto.setInventorySold(book.getInventory().getSold());
-            bookDto.setInventorySupplied(book.getInventory().getSupplied());
-        }
-
-        try {
-            AuthorDto[] authors = client.target("http://localhost:8080")
-                    .path("authors/find/{isbn}")
-                    .resolveTemplate("isbn", book.getIsbn())
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(AuthorDto[].class);
-
-            bookDto.setAuthors(Stream.of(authors)
-                    .map(AuthorDto::getName)
-                    .toList());
-        } catch (Exception e) {
-            // En caso de error en el servicio de autores, simplemente deja la lista vacía
-            bookDto.setAuthors(List.of());
-        }
-
-        return bookDto;
-    }).toList();
-
-    return Response.ok(booksWithAuthors).build();
+    // Obtener todos los libros del repositorio y mapearlos a DTOs
+    return booksRepository.streamAll()
+            .map(book -> {
+                var dto = new BookDto(); // Mapear la entidad Book a BookDto
+                mapper.map(book, dto);
+                return dto;
+            })
+            .map(book -> {
+                // Consultar los autores del libro usando el cliente REST
+                var authors = client.findByBook(book.getIsbn())
+                        .stream()
+                        .map(AuthorDto::getName) // Obtener solo los nombres de los autores
+                        .toList();
+                book.setAuthors(authors); // Asignar la lista de autores al DTO del libro
+                return book;
+            })
+            .toList();
 }
-
-
-
-    @GET
-    public List<Book> findAll() {
-        return booksRepository.listAll();
-    }
 
     @POST
     public void insert(Book book) {
