@@ -11,7 +11,7 @@ public class BookAuthor {
     @EmbeddedId
     private BookAuthorId id;
 
-    @ManyToOne
+    @ManyToOne // muchos registros de la entidad BookAuthor pueden estar asociados a un solo registro de la entidad Author
     @MapsId("authorId")
     @JoinColumn(name="authors_id", nullable = false)
     private Author author;

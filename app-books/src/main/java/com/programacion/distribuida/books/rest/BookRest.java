@@ -5,6 +5,10 @@ import com.programacion.distribuida.books.db.Book;
 import com.programacion.distribuida.books.dtos.AuthorDto;
 import com.programacion.distribuida.books.dtos.BookDto;
 import com.programacion.distribuida.books.repo.BooksRepository;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.stork.Stork;
+import io.smallrye.stork.api.Service;
+import io.smallrye.stork.api.ServiceInstance;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -18,6 +22,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Path("/books")
@@ -33,6 +38,9 @@ public class BookRest {
     @Inject
     ModelMapper mapper;
 
+//    @Inject
+//    Stork stork;
+
     @Inject
     @ConfigProperty(name = "authors.url")
     String authorsUrl;
@@ -44,6 +52,30 @@ public class BookRest {
     @GET
     @Path("/{isbn}")
     public Response findById(@PathParam("isbn") String isbn) {
+
+        var stork = Stork.getInstance();
+
+        Service service = stork.getService("my-service");
+        Uni<List<ServiceInstance>> instances = service.getInstances();
+        Uni<ServiceInstance> instance = service.selectInstance();
+
+        Map<String, Service> services = stork.getServices();
+        services.entrySet().stream().forEach(it -> {
+            System.out.println(it.getKey() + " -> " + it.getValue());
+            var ser = it.getValue();
+
+            ser.getInstances()
+                    .subscribe().with(
+                            ls -> {
+                                ls.forEach(
+                                        inst -> {
+                                            System.out.println(" " + inst.getHost() + ":" + inst.getPort());
+                                        });
+                            });
+        });
+
+        System.out.println("Available services: " + services);
+
         // Crear un nuevo DTO para el libro
         BookDto bookDto = new BookDto();
 
@@ -69,32 +101,32 @@ public class BookRest {
     }
 
 
-@GET
-@Path("/findAll")
-public List<BookDto> findAll() {
-    // Crear un cliente REST para consultar los autores usando la URL configurada
-    AuthorRestClient client = RestClientBuilder.newBuilder()
-            .baseUri(authorsUrl)
-            .build(AuthorRestClient.class);
+    @GET
+    @Path("/findAll")
+    public List<BookDto> findAll() {
+        // Crear un cliente REST para consultar los autores usando la URL configurada
+        AuthorRestClient client = RestClientBuilder.newBuilder()
+                .baseUri(authorsUrl)
+                .build(AuthorRestClient.class);
 
-    // Obtener todos los libros del repositorio y mapearlos a DTOs
-    return booksRepository.streamAll()
-            .map(book -> {
-                var dto = new BookDto(); // Mapear la entidad Book a BookDto
-                mapper.map(book, dto);
-                return dto;
-            })
-            .map(book -> {
-                // Consultar los autores del libro usando el cliente REST
-                var authors = client.findByBook(book.getIsbn())
-                        .stream()
-                        .map(AuthorDto::getName) // Obtener solo los nombres de los autores
-                        .toList();
-                book.setAuthors(authors); // Asignar la lista de autores al DTO del libro
-                return book;
-            })
-            .toList();
-}
+        // Obtener todos los libros del repositorio y mapearlos a DTOs
+        return booksRepository.streamAll()
+                .map(book -> {
+                    var dto = new BookDto(); // Mapear la entidad Book a BookDto
+                    mapper.map(book, dto);
+                    return dto;
+                })
+                .map(book -> {
+                    // Consultar los autores del libro usando el cliente REST
+                    var authors = client.findByBook(book.getIsbn())
+                            .stream()
+                            .map(AuthorDto::getName) // Obtener solo los nombres de los autores
+                            .toList();
+                    book.setAuthors(authors); // Asignar la lista de autores al DTO del libro
+                    return book;
+                })
+                .toList();
+    }
 
     @POST
     public void insert(Book book) {

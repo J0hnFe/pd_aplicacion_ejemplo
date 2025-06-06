@@ -20,6 +20,7 @@ java {
 }
 
 dependencies {
+    implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:${quarkusVersion}"))
 
     // Contenedor CDI

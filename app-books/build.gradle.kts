@@ -20,6 +20,7 @@ java {
 }
 
 dependencies {
+    implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:${quarkusVersion}"))
 
     // Contenedor CDI
@@ -42,6 +43,11 @@ dependencies {
     // Control versiones base de datos
 //    implementation("io.quarkus:quarkus-flyway")
 //    implementation("org.flywaydb:flyway-database-postgresql")
+
+    // Service discovery
+    implementation("io.quarkus:quarkus-smallrye-stork")
+    implementation("io.smallrye.stork:stork-service-discovery-static-list")
+
 
 }
 

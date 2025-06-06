@@ -11,7 +11,10 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 // @RegisterRestClient(baseUri = "http://localhost:8081")
-@RegisterRestClient(configKey = "authors.api")
+//@RegisterRestClient(configKey = "authors.api")
+
+@RegisterRestClient(baseUri = "stork://authors-api")
+
 public interface AuthorRestClient {
 
     @GET
