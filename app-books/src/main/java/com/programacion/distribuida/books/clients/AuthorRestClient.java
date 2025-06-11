@@ -10,7 +10,7 @@ import java.util.List;
 @Path("/authors")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-// @RegisterRestClient(baseUri = "http://localhost:8081")
+//@RegisterRestClient(baseUri = "http://localhost:8081")
 //@RegisterRestClient(configKey = "authors.api")
 
 @RegisterRestClient(baseUri = "stork://authors-api")
