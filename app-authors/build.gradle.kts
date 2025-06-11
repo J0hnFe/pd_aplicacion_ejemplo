@@ -26,7 +26,6 @@ dependencies {
     // Contenedor CDI
     implementation("io.quarkus:quarkus-arc") //Usa CDI 4.1
 
-
     // Contenedor de REST
     implementation("io.quarkus:quarkus-rest") //Es implmentacion de jax rs
     implementation("io.quarkus:quarkus-rest-jsonb")
@@ -39,6 +38,10 @@ dependencies {
     implementation("io.quarkus:quarkus-flyway")
     implementation("org.flywaydb:flyway-database-postgresql")
 
+    // Service discovery
+    implementation("io.quarkus:quarkus-smallrye-stork")
+    implementation("io.smallrye.stork:stork-service-discovery-consul")
+    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client")
 }
 
 tasks.withType<JavaCompile> {
