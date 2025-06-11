@@ -38,7 +38,7 @@ dependencies {
     // Contenedor de JPA
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
-    implementation("org.modelmapper:modelmapper:3.2.2") // Libreria para mapear objetos
+    implementation("org.modelmapper:modelmapper:3.2.3") // Libreria para mapear objetos
 
     // Control versiones base de datos
 //    implementation("io.quarkus:quarkus-flyway")

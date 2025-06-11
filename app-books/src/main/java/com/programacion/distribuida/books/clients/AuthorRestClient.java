@@ -10,15 +10,11 @@ import java.util.List;
 @Path("/authors")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-//@RegisterRestClient(baseUri = "http://localhost:8081")
+//@RegisterRestClient(baseUri = "http://localhost:8080")
 //@RegisterRestClient(configKey = "authors.api")
-
 @RegisterRestClient(baseUri = "stork://authors-api")
-
 public interface AuthorRestClient {
-
     @GET
     @Path("/find/{isbn}")
-    public List<AuthorDto> findByBook(@PathParam("isbn") String isbn);
-
+    List<AuthorDto> findByBook(@PathParam("isbn") String isbn);
 }

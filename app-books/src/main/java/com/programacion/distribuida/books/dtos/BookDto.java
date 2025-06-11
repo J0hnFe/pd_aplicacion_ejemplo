@@ -11,9 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class BookDto {
-
     private String isbn;
-//    private Inventory inventory;
     private String title;
     private BigDecimal price;
 
@@ -21,6 +19,4 @@ public class BookDto {
     private Integer inventorySupplied;
 
     private List<String> authors;
-
-
 }

@@ -5,11 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "inventory")
 @Getter
 @Setter
-@Table(name = "inventory")
 public class Inventory {
-
     @Id
     @OneToOne
     @JoinColumn(name = "isbn")

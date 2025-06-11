@@ -13,4 +13,13 @@ public class BooksRepository implements PanacheRepositoryBase<Book, String> {
         String query = "SELECT o FROM Book o WHERE o.isbn=?1";
         return this.find(query, isbn).firstResult();
     }
+
+    public void update(String isbn, Book book) {
+        this.findByIdOptional(isbn)
+                .ifPresent(existingBook -> {
+                    existingBook.setTitle(book.getTitle());
+                    existingBook.setPrice(book.getPrice());
+                    existingBook.setVersion(existingBook.getVersion()+1);
+                });
+    }
 }
