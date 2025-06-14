@@ -41,8 +41,8 @@ dependencies {
     implementation("org.modelmapper:modelmapper:3.2.3") // Libreria para mapear objetos
 
     // Control versiones base de datos
-//    implementation("io.quarkus:quarkus-flyway")
-//    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("io.quarkus:quarkus-flyway")
+    implementation("org.flywaydb:flyway-database-postgresql")
 
     // Service discovery
     implementation("io.quarkus:quarkus-smallrye-stork")
