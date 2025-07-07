@@ -36,53 +36,66 @@ public class AuthorsLifeCycle {
     // Necesitamos escuchar 2 eventos: Inicializacion y cuando se detiene
     // Cuando arranca
     void init(@Observes StartupEvent event, Vertx vertx) throws Exception {
-        System.out.println("Iniciando servicio de autoresss...");
+        try {
+            System.out.println("Iniciando servicio de autoresss...");
 
-        // Obtenemos host y puerto de la configuracion
-        ConsulClientOptions options = new ConsulClientOptions()
-                .setHost(consulHost)
-                .setPort(consulPort);
-        ConsulClient consulClient = ConsulClient.create(vertx, options);
+            // Obtenemos host y puerto de la configuracion
+            ConsulClientOptions options = new ConsulClientOptions()
+                    .setHost(consulHost)
+                    .setPort(consulPort);
+            ConsulClient consulClient = ConsulClient.create(vertx, options);
 
-        serviceId = UUID.randomUUID().toString();
-        var ipAddress = InetAddress.getLocalHost();
+            serviceId = UUID.randomUUID().toString();
+            var ipAddress = InetAddress.getLocalHost();
 
-        // Listo los tags que voy a usar
-        var tags = List.of(
-                "traefik.enable=true",
-                "traefik.http.routers.app-authors.rule=PathPrefix(`/app-authors`)",
-                "traefik.http.routers.app-authors.middlewares=strip-prefix-authors",
-                "traefik.http.middlewares.strip-prefix-authors.stripprefix.prefixes=/app-authors"
-        );
+            // Listo los tags que voy a usar
+            var tags = List.of(
+                    "traefik.enable=true",
+                    "traefik.http.routers.app-authors.rule=PathPrefix(`/app-authors`)",
+                    "traefik.http.routers.app-authors.middlewares=strip-prefix-authors",
+                    "traefik.http.middlewares.strip-prefix-authors.stripprefix.prefixes=/app-authors"
+            );
 
-        var checkOptions = new CheckOptions()
+            var checkOptions = new CheckOptions()
 //                .setHttp("http://127.0.0.1:8080/ping") // Esto estatico
-                .setHttp(String.format(("http://%s:%s/ping"), ipAddress.getHostAddress(), appPort))
-                .setInterval("10s")
-                .setDeregisterAfter("20s");
+                    .setHttp(String.format(("http://%s:%s/ping"), ipAddress.getHostAddress(), appPort))
+                    .setInterval("10s")
+                    .setDeregisterAfter("20s");
 
-        ServiceOptions serviceOptions = new ServiceOptions()
-                .setName("app-authors")
-                .setId(serviceId)
-                .setAddress(ipAddress.getHostAddress())
-                .setPort(appPort)
-                .setTags(tags)
-                .setCheckOptions(checkOptions);
+            ServiceOptions serviceOptions = new ServiceOptions()
+                    .setName("app-authors")
+                    .setId(serviceId)
+                    .setAddress(ipAddress.getHostAddress())
+                    .setPort(appPort)
+                    .setTags(tags)
+                    .setCheckOptions(checkOptions);
 
-        consulClient.registerServiceAndAwait(serviceOptions);
+            consulClient.registerServiceAndAwait(serviceOptions);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Cuando se detiene
     void stop(@Observes ShutdownEvent event, Vertx vertx) throws Exception {
+        try {
+            System.out.println("Deteniendo servicio de autoresss...");
 
-        System.out.println("Deteniendo servicio de autoresss...");
+            ConsulClientOptions options = new ConsulClientOptions()
+                    .setHost(consulHost)
+                    .setPort(consulPort);
+            ConsulClient consulClient = ConsulClient.create(vertx, options);
 
-        ConsulClientOptions options = new ConsulClientOptions()
-                .setHost(consulHost)
-                .setPort(consulPort);
-        ConsulClient consulClient = ConsulClient.create(vertx, options);
+            consulClient.deregisterServiceAndAwait(serviceId);
+        } catch (Exception e) {
+            System.out.println("Deteniendo servicio de autoresss...");
 
-        consulClient.deregisterServiceAndAwait(serviceId);
+            ConsulClientOptions options = new ConsulClientOptions()
+                    .setHost(consulHost)
+                    .setPort(consulPort);
+            ConsulClient consulClient = ConsulClient.create(vertx, options);
 
+            consulClient.deregisterServiceAndAwait(serviceId);
+        }
     }
 }
