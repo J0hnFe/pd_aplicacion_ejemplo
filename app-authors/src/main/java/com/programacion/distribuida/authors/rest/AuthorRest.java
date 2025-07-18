@@ -18,6 +18,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
+
 public class AuthorRest {
     @Inject
     AuthorRepo authorRepo;
