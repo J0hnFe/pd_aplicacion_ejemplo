@@ -35,13 +35,18 @@ public class PurchaseOrderRest {
         dto.getLineItems()
                 .stream()
                 .forEach(item -> {
-                    var book = bookRestClient.findByBook(item.getIsbn());
+                    try {
+                        var book = bookRestClient.findByBook(item.getIsbn());
 
-                    item.setIsbn(book.getIsbn());
-                    item.setTitle(book.getTitle());
-                    item.setPrice(book.getPrice());
-
-                    item.setAuthors(book.getAuthors());
+                        if (book != null) {
+                            item.setIsbn(book.getIsbn());
+                            item.setTitle(book.getTitle());
+                            item.setPrice(book.getPrice());
+                            item.setAuthors(book.getAuthors());
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error fetching book data for ISBN: " + item.getIsbn() + " - " + e.getMessage());
+                    }
                 });
 
         return dto;

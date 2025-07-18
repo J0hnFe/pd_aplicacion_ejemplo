@@ -2,9 +2,6 @@
 # docker build -t j0hnfe/app-authors .   ------------------> esto construye la imagen y la etiqueta
 # docker push j0hnfe/app-authors         ------------------> esto sube la imagen al repositorio
 
-#desde donde este el dockercomposeyml
-#docker compose up -d
-
 FROM eclipse-temurin:21.0.7_6-jre-noble
 
 RUN mkdir /app

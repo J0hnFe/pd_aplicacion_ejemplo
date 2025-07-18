@@ -18,9 +18,9 @@ VALUES ('1111', 5, 10),
 -- status es smallint; placed_on y delivered_on son timestamp without timezone
 INSERT INTO public.purchase_orders (id, customer_id, total, status, placed_on, delivered_on)
 VALUES (1, 1, 20, 1, '2025-06-01 09:30:00', '2025-06-03 14:45:00'),
-       (2, 2, 150, 2, '2025-06-05 11:15:00', '2025-06-07 10:00:00'),
+       (2, 2, 150, 0, '2025-06-05 11:15:00', '2025-06-07 10:00:00'),
        (3, 3, 75, 1, '2025-06-10 16:00:00', '2025-06-12 18:20:00'),
-       (4, 1, 40, 3, '2025-06-12 08:00:00', '2025-06-14 12:00:00');
+       (4, 1, 40, 0, '2025-06-12 08:00:00', '2025-06-14 12:00:00');
 
 -- Insercion en tabla line_items
 INSERT INTO public.line_items (id, order_id, quantity, isbn)
