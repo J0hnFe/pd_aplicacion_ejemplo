@@ -16,14 +16,14 @@ spec:
     spec:
       containers:
         - name: app-authors
-          image: j0hnfe/app-authors:latest
+          image: j0hnfe/app-authors-1:latest
           env:
             - name: QUARKUS_DATASOURCE_USERNAME
               value: postgres
             - name: QUARKUS_DATASOURCE_PASSWORD
-              value: postgres
+              value: Felipe123@
             - name: QUARKUS_DATASOURCE_JDBC_URL
-              value: jdbc:postgresql://distribuida-db.camtpq9odqbt.us-east-1.rds.amazonaws.com/distribuida
+              value: jdbc:postgresql://my-server.postgres.database.azure.com/distribuida
             - name: QUARKUS_HTTP_PORT
               value: "8080"
             - name: CONSUL_HOST

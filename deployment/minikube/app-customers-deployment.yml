@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: app-customers
-          image: j0hnfe/app-customers:latest
+          image: j0hnfe/app-customers-1:latest
           env:
             - name: QUARKUS_DATASOURCE_USERNAME
               value: postgres

@@ -52,6 +52,9 @@ dependencies {
     // Metricas se exponen en: http://localhost:8080/q/metrics
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
     implementation("io.quarkus:quarkus-jackson")
+
+    // Health
+    implementation("io.quarkus:quarkus-smallrye-health")
 }
 
 tasks.withType<JavaCompile> {
