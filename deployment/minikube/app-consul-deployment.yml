@@ -27,7 +27,8 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: consul
+    app: app-consul
   ports:
     - protocol: TCP
       port: 8500
+      targetPort: 8500

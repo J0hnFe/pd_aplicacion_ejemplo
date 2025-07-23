@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-authors
+  name: app-customers
   labels:
-    app: app-authors
+    app: app-customers
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-authors
+      app: app-customers
   template:
     metadata:
       labels:
-        app: app-authors
+        app: app-customers
     spec:
       containers:
-        - name: app-authors
-          image: j0hnfe/app-authors:latest
+        - name: app-customers
+          image: j0hnfe/app-customers:latest
           env:
             - name: QUARKUS_DATASOURCE_USERNAME
               value: postgres
@@ -44,11 +44,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-authors-service
+  name: app-customers-service
 spec:
   type: ClusterIP
   selector:
-    app: app-authors
+    app: app-customers
   ports:
     - protocol: TCP
       port: 8080
@@ -57,12 +57,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: app-authors-hpa
+  name: app-customers-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: app-authors
+    name: app-customers
   minReplicas: 1
   maxReplicas: 10
   metrics:

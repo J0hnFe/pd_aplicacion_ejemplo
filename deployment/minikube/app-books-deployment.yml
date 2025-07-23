@@ -23,13 +23,15 @@ spec:
             - name: QUARKUS_DATASOURCE_PASSWORD
               value: postgres
             - name: QUARKUS_DATASOURCE_JDBC_URL
-              value: jdbc:postgresql://dbserver:5432/distribuida
+              value: jdbc:postgresql://distribuida-db.camtpq9odqbt.us-east-1.rds.amazonaws.com/distribuida
             - name: QUARKUS_HTTP_PORT
               value: "8080"
             - name: CONSUL_HOST
               value: consul
             - name: CONSUL_PORT
               value: "8500"
+            - name: QUARKUS_FLYWAY_ACTIVATE
+              value: "true"
           ports:
             - containerPort: 8080
           resources:
